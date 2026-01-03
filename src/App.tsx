@@ -1,12 +1,15 @@
-
-import './App.css'
+import { ThemeProvider } from "@/components/theme-provider"
 
 function App() {
 
   return (
-    <div>
-      <h1>Coming Soon</h1>
-    </div>
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <div className="h-dvh flex items-center justify-center">
+        <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance">
+          Soon
+        </h1>
+      </div>
+    </ThemeProvider>
   )
 }
 
