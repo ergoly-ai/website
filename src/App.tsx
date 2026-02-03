@@ -1,76 +1,201 @@
+import { useState, useEffect, useRef } from "react"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Button } from "@/components/ui/button"
-import { MessageSquare, Users, TrendingUp, Zap, Shield } from "lucide-react"
+import logoLight from "@/assets/logo-light.svg"
+import neverForgetImg from "@/assets/never-forget.svg"
+import doesWorkImg from "@/assets/does-work.svg"
+import controllImg from "@/assets/controll.svg"
+import teachImg from "@/assets/teach.svg"
+import correctingImg from "@/assets/correcting.svg"
+import scaleImg from "@/assets/scale.svg"
+import mascotImg from "@/assets/mascot.png"
+
+function useReveal() {
+  const ref = useRef<HTMLDivElement>(null)
+  const [visible, setVisible] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const obs = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setVisible(true)
+          obs.disconnect()
+        }
+      },
+      { threshold: 0.15 }
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+  return { ref, className: visible ? "animate-fade-up" : "opacity-0" }
+}
 
 function App() {
+  const [email, setEmail] = useState("")
+  const [emailError, setEmailError] = useState("")
+  const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+
+  const scrollToWaitlist = () => {
+    document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })
+  }
+
+  const validateEmail = (value: string) => {
+    if (!value) return "Please enter your email."
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return "Please enter a valid email."
+    return ""
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const error = validateEmail(email)
+    if (error) {
+      setEmailError(error)
+      return
+    }
+    setEmailError("")
+    setSubmitting(true)
+    try {
+      const params = new URLSearchParams(window.location.search)
+      const res = await fetch("https://script.google.com/macros/s/AKfycbwFDekSi8IVFmKMR4riZ2C6M4m-hCkL6Ou3Rm4dlewFSN-RZ2AJFW9pTbztFE3w00ZH/exec", {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          email,
+          utm_source: params.get("utm_source") || "",
+          utm_medium: params.get("utm_medium") || "",
+          utm_campaign: params.get("utm_campaign") || "",
+          referrer: document.referrer,
+          device: /Mobile|Android/i.test(navigator.userAgent) ? "Mobile" : "Desktop",
+          pageUrl: window.location.href,
+        }),
+      })
+      const result = await res.json()
+      if (result.success) {
+        setSubmitted(true)
+      } else {
+        setEmailError("Something went wrong. Please try again.")
+      }
+    } catch {
+      setEmailError("Something went wrong. Please try again.")
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const problem = useReveal()
+  const cards = useReveal()
+  const howItWorks = useReveal()
+  const whyNow = useReveal()
+  const waitlist = useReveal()
 
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <ThemeProvider>
       <div className="min-h-screen">
         {/* Navigation */}
-        <nav className="border-b">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <div className="text-2xl font-bold">Ergoly</div>
-            <div className="flex gap-4">
-              <Button variant="ghost">Sign In</Button>
-              <Button>Get Started</Button>
-            </div>
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
+          <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+            <img src={logoLight} alt="Ergoly" className="h-7" />
+            <Button
+              size="sm"
+              onClick={scrollToWaitlist}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+            >
+              Join the Waitlist
+            </Button>
           </div>
         </nav>
 
-        {/* Hero Section */}
-        <section className="container mx-auto px-4 py-20 md:py-32">
-          <div className="max-w-4xl mx-auto text-center space-y-8">
-            <div className="inline-block px-4 py-1.5 bg-primary/10 rounded-full text-sm font-medium mb-4">
-              The Shopify for Services Companies
+        {/* Hero */}
+        <section className="pt-32 pb-20 md:pt-44 md:pb-32">
+          <div className="container mx-auto px-6">
+            <div className="max-w-5xl mx-auto text-center space-y-4">
+              {/* Mascot */}
+              <div
+                className="flex justify-center animate-fade-up"
+                style={{ animationDelay: "0s" }}
+              >
+                <img
+                  src={mascotImg}
+                  alt="Ergoly mascot"
+                  className="h-48 md:h-56 w-auto"
+                />
+              </div>
+              <h1
+                className="text-4xl md:text-6xl font-extrabold tracking-tight leading-[1.1] animate-fade-up"
+                style={{ animationDelay: "0.15s" }}
+              >
+                Train AI workers on your expertise.{" "}
+                <span className="text-primary">Scale your service company.</span>
+              </h1>
+              <p
+                className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed animate-fade-up"
+                style={{ animationDelay: "0.35s" }}
+              >
+                Ergoly is infrastructure for founders who run service companies
+                with AI workers — trained on their domain expertise, learning
+                from every correction, working alongside them.{" "}
+                <span className="text-foreground font-medium">
+                  No engineering team required.
+                </span>
+              </p>
+              <div
+                className="pt-8 animate-fade-up"
+                style={{ animationDelay: "0.55s" }}
+              >
+                <Button
+                  size="lg"
+                  onClick={scrollToWaitlist}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground text-base px-8"
+                >
+                  Join the Waitlist
+                </Button>
+                <p className="text-sm text-muted-foreground mt-3">
+                  Early access. We onboard as capacity allows.
+                </p>
+              </div>
             </div>
-            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-balance">
-              Scale Your Service Business With AI Workers
-            </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto">
-              Deploy trained AI team members who handle client communication, learn from feedback, and coordinate work together. Serve 3-5x more clients without hiring.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="text-lg px-8">
-                Start Free Trial
-              </Button>
-              <Button size="lg" variant="outline" className="text-lg px-8">
-                Watch Demo
-              </Button>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              No credit card required. Set up in 10 minutes.
-            </p>
           </div>
         </section>
 
-        {/* Problem Section */}
-        <section className="border-t bg-muted/30">
-          <div className="container mx-auto px-4 py-20">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-                Every service business hits the same wall
-              </h2>
-              <div className="grid md:grid-cols-3 gap-8">
-                <div className="space-y-3">
-                  <div className="text-5xl">⏰</div>
-                  <h3 className="text-xl font-semibold">Can't Scale</h3>
-                  <p className="text-muted-foreground">
-                    You're maxed out at 15-20 clients. Hiring is expensive and takes months to train someone who understands your clients.
+        {/* Problem */}
+        <section className="py-20 md:py-32">
+          <div ref={problem.ref} className={problem.className}>
+            <div className="container mx-auto px-6">
+              <div className="max-w-3xl mx-auto">
+                <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-10">
+                  Your expertise doesn't scale. Yet.
+                </h2>
+                <div className="mb-12 relative">
+                  <span
+                    className="absolute -top-6 -left-2 text-7xl text-primary/20 leading-none select-none"
+                    style={{ fontFamily: "'Playfair Display', serif" }}
+                  >
+                    "
+                  </span>
+                  <blockquote
+                    className="pl-4 text-2xl md:text-3xl italic text-foreground/80 leading-snug"
+                    style={{ fontFamily: "'Playfair Display', serif" }}
+                  >
+                    There would be so many jobs but I can not do them all
+                  </blockquote>
+                  <p className="mt-3 pl-4 text-sm text-muted-foreground">
+                    — Stefan
                   </p>
                 </div>
-                <div className="space-y-3">
-                  <div className="text-5xl">🔥</div>
-                  <h3 className="text-xl font-semibold">Always On Call</h3>
-                  <p className="text-muted-foreground">
-                    Clients message at all hours. You're stuck being the bottleneck for every question, update, and request.
+                <div className="space-y-6 text-muted-foreground text-lg leading-relaxed">
+                  <p>
+                    You've spent years mastering your craft. Clients pay for your
+                    judgment, your style, your standards. But growing means
+                    hiring — and training someone to think like you takes months.
+                    When they leave, you start over.
                   </p>
-                </div>
-                <div className="space-y-3">
-                  <div className="text-5xl">😰</div>
-                  <h3 className="text-xl font-semibold">Inconsistent Quality</h3>
-                  <p className="text-muted-foreground">
-                    Some clients get quick responses and great service. Others slip through the cracks. It's impossible to maintain quality at scale.
+                  <p>
+                    AI tools are everywhere now. But they reset every conversation.
+                    They don't know your clients, your preferences, or how you
+                    make decisions. You end up repeating yourself more than you
+                    would with a junior hire.
                   </p>
                 </div>
               </div>
@@ -78,88 +203,65 @@ function App() {
           </div>
         </section>
 
-        {/* Solution Section */}
-        <section className="border-t">
-          <div className="container mx-auto px-4 py-20">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-                Meet Your AI Team
-              </h2>
-              <p className="text-xl text-muted-foreground text-center mb-16">
-                Ergoly gives you trained AI workers who show up in your clients' Slack. They communicate naturally, learn what each client prefers, and get better over time.
-              </p>
-
-              <div className="space-y-12">
-                <div className="flex flex-col md:flex-row gap-8 items-start">
-                  <div className="md:w-1/3 space-y-2">
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-3">
-                      <Users className="w-6 h-6" />
+        {/* What We Built — 3 Cards with Illustrations */}
+        <section className="py-20 md:py-32">
+          <div ref={cards.ref} className={cards.className}>
+            <div className="container mx-auto px-6">
+              <div className="max-w-5xl mx-auto">
+                <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-14">
+                  AI workers that learn. Remember. And get better.
+                </h2>
+                <div className="grid md:grid-cols-3 gap-10">
+                  <div className="text-center space-y-4">
+                    <div className="h-[140px] flex items-center justify-center mx-auto">
+                      <img
+                        src={neverForgetImg}
+                        alt="AI workers that remember everything"
+                        className="h-full w-auto"
+                      />
                     </div>
-                    <h3 className="text-2xl font-bold">Emma, Account Manager</h3>
-                    <p className="text-muted-foreground">
-                      Handles client questions, provides updates, schedules meetings, and ensures nothing falls through the cracks. Available 24/7.
+                    <h3 className="text-lg font-semibold">
+                      They remember everything.
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed text-sm">
+                      Correct once — it sticks. Your AI workers learn your
+                      preferences, your edge cases, your judgment. Every correction
+                      compounds. They get sharper, not just busier.
                     </p>
                   </div>
-                  <div className="md:w-2/3 bg-muted/50 rounded-lg p-6 border">
-                    <div className="space-y-4 font-mono text-sm">
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 bg-primary rounded flex-shrink-0 flex items-center justify-center text-xs font-bold">E</div>
-                        <div>
-                          <div className="font-semibold mb-1">Emma</div>
-                          <div>Hey Sarah! Quick update on the Q1 campaign - we're tracking 20% above target on conversions. The team wrapped up the competitor analysis you asked about. I'll have Jake share findings tomorrow morning. Anything else you need from us this week?</div>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-3 opacity-60">
-                        <div className="w-8 h-8 bg-muted-foreground rounded flex-shrink-0"></div>
-                        <div className="text-muted-foreground">Sarah reacted with 👍</div>
-                      </div>
+                  <div className="text-center space-y-4">
+                    <div className="h-[140px] flex items-center justify-center mx-auto">
+                      <img
+                        src={doesWorkImg}
+                        alt="AI workers that take action"
+                        className="h-full w-auto"
+                      />
                     </div>
-                  </div>
-                </div>
-
-                <div className="flex flex-col md:flex-row-reverse gap-8 items-start">
-                  <div className="md:w-1/3 space-y-2">
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-3">
-                      <MessageSquare className="w-6 h-6" />
-                    </div>
-                    <h3 className="text-2xl font-bold">Jake, Project Manager</h3>
-                    <p className="text-muted-foreground">
-                      Coordinates deliverables, tracks timelines, and keeps clients informed on progress. Works with Emma to deliver seamlessly.
+                    <h3 className="text-lg font-semibold">
+                      They do things, not just answer.
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed text-sm">
+                      Email, Slack, calendar, CRM — your AI workers use your
+                      tools. They draft, schedule, research, and follow up. Ergoly
+                      is their workspace.
                     </p>
                   </div>
-                  <div className="md:w-2/3 bg-muted/50 rounded-lg p-6 border">
-                    <div className="space-y-4 font-mono text-sm">
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 bg-blue-500 rounded flex-shrink-0 flex items-center justify-center text-xs font-bold">J</div>
-                        <div>
-                          <div className="font-semibold mb-1">Jake</div>
-                          <div>Morning! Competitor analysis complete - found 3 positioning opportunities we should discuss. Emma mentioned you wanted this by EOD but we finished early. I've created a doc with findings + next steps. Want to schedule 30min this week to review?</div>
-                        </div>
-                      </div>
+                  <div className="text-center space-y-4">
+                    <div className="h-[140px] flex items-center justify-center mx-auto">
+                      <img
+                        src={controllImg}
+                        alt="You stay in control"
+                        className="h-full w-auto"
+                      />
                     </div>
-                  </div>
-                </div>
-
-                <div className="flex flex-col md:flex-row gap-8 items-start">
-                  <div className="md:w-1/3 space-y-2">
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-3">
-                      <Shield className="w-6 h-6" />
-                    </div>
-                    <h3 className="text-2xl font-bold">Alex, Operations Lead</h3>
-                    <p className="text-muted-foreground">
-                      Manages processes, onboards new clients, handles billing questions, and ensures smooth operations across all accounts.
+                    <h3 className="text-lg font-semibold">
+                      You stay in control.
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed text-sm">
+                      When something needs your judgment, the AI worker hands it to
+                      you. You handle the edge decisions. The AI handles the
+                      volume.
                     </p>
-                  </div>
-                  <div className="md:w-2/3 bg-muted/50 rounded-lg p-6 border">
-                    <div className="space-y-4 font-mono text-sm">
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 bg-green-500 rounded flex-shrink-0 flex items-center justify-center text-xs font-bold">A</div>
-                        <div>
-                          <div className="font-semibold mb-1">Alex</div>
-                          <div>Welcome aboard! I've set up your workspace and added Emma as your main point of contact. She'll reach out today to kick things off. Your first strategy call is scheduled for Thursday at 2pm. Let me know if you need anything!</div>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -168,167 +270,67 @@ function App() {
         </section>
 
         {/* How It Works */}
-        <section className="border-t bg-muted/30">
-          <div className="container mx-auto px-4 py-20">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-                How It Works
-              </h2>
-              <p className="text-xl text-muted-foreground text-center mb-16">
-                Set up your AI team in minutes. No technical skills required.
-              </p>
-
-              <div className="grid md:grid-cols-4 gap-8">
-                <div className="space-y-3 text-center">
-                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-2xl font-bold mx-auto">1</div>
-                  <h3 className="text-lg font-semibold">Choose Your Team</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Pick from pre-trained AI workers (Emma, Jake, Alex) or create custom roles.
-                  </p>
-                </div>
-                <div className="space-y-3 text-center">
-                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-2xl font-bold mx-auto">2</div>
-                  <h3 className="text-lg font-semibold">Connect Slack</h3>
-                  <p className="text-sm text-muted-foreground">
-                    One-click Slack integration. Your workers appear in client channels instantly.
-                  </p>
-                </div>
-                <div className="space-y-3 text-center">
-                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-2xl font-bold mx-auto">3</div>
-                  <h3 className="text-lg font-semibold">Add Clients</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Invite clients to Slack. Each gets their own trained team that learns their preferences.
-                  </p>
-                </div>
-                <div className="space-y-3 text-center">
-                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-2xl font-bold mx-auto">4</div>
-                  <h3 className="text-lg font-semibold">Train With Feedback</h3>
-                  <p className="text-sm text-muted-foreground">
-                    React with 👍 or 👎 to messages. Your workers learn and improve automatically.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Key Benefits */}
-        <section className="border-t">
-          <div className="container mx-auto px-4 py-20">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
-                The Difference You'll Feel Immediately
-              </h2>
-
-              <div className="grid md:grid-cols-2 gap-8">
-                <div className="space-y-4 p-6 border rounded-lg">
-                  <Zap className="w-8 h-8 text-primary" />
-                  <h3 className="text-xl font-bold">3-5x More Clients</h3>
-                  <p className="text-muted-foreground">
-                    Go from 15 clients maxed out to 50+ with the same core team. Your AI workers handle routine communication, coordination, and updates while you focus on strategic work.
-                  </p>
-                </div>
-
-                <div className="space-y-4 p-6 border rounded-lg">
-                  <TrendingUp className="w-8 h-8 text-primary" />
-                  <h3 className="text-xl font-bold">Learns Your Clients</h3>
-                  <p className="text-muted-foreground">
-                    Each client gets workers trained specifically for them. The system learns communication preferences, project history, and what makes each client happy - automatically.
-                  </p>
-                </div>
-
-                <div className="space-y-4 p-6 border rounded-lg">
-                  <MessageSquare className="w-8 h-8 text-primary" />
-                  <h3 className="text-xl font-bold">Works Where Clients Are</h3>
-                  <p className="text-muted-foreground">
-                    No new tools for clients to learn. Your workers show up in Slack, where clients already communicate. They see familiar faces and get instant responses.
-                  </p>
-                </div>
-
-                <div className="space-y-4 p-6 border rounded-lg">
-                  <Shield className="w-8 h-8 text-primary" />
-                  <h3 className="text-xl font-bold">You Stay In Control</h3>
-                  <p className="text-muted-foreground">
-                    Review every message, guide with emoji feedback, and watch quality metrics in real-time. Your workers improve based on what you teach them.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Why Different */}
-        <section className="border-t bg-muted/30">
-          <div className="container mx-auto px-4 py-20">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-                Why Ergoly Is Different
-              </h2>
-              <p className="text-xl text-muted-foreground text-center mb-16">
-                This isn't a chatbot or AI assistant. It's a complete operating system for running your service business.
-              </p>
-
-              <div className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="p-6 border rounded-lg bg-background">
-                    <div className="font-semibold mb-2">❌ Generic AI Tools</div>
-                    <ul className="space-y-2 text-sm text-muted-foreground">
-                      <li>• Forgets context between messages</li>
-                      <li>• One-size-fits-all responses</li>
-                      <li>• You do all the coordination</li>
-                      <li>• Clients need training on new tools</li>
-                    </ul>
+        <section className="py-20 md:py-32">
+          <div ref={howItWorks.ref} className={howItWorks.className}>
+            <div className="container mx-auto px-6">
+              <div className="max-w-5xl mx-auto">
+                <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-14">
+                  How it works
+                </h2>
+                <div className="grid md:grid-cols-3 gap-10">
+                  <div className="space-y-4">
+                    <div className="h-[180px] flex items-center justify-center">
+                      <img
+                        src={teachImg}
+                        alt="Teach — upload documents and show the AI how you work"
+                        className="h-full w-auto"
+                      />
+                    </div>
+                    <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
+                      1
+                    </div>
+                    <h3 className="text-lg font-semibold">Teach</h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Show your AI workers how you work. Upload examples,
+                      preferences, and documents — like writing a brief for a new
+                      hire.
+                    </p>
                   </div>
-                  <div className="p-6 border-2 border-primary rounded-lg bg-primary/5">
-                    <div className="font-semibold mb-2">✓ Ergoly Workers</div>
-                    <ul className="space-y-2 text-sm">
-                      <li>• Remembers full client history</li>
-                      <li>• Learns each client's preferences</li>
-                      <li>• Workers coordinate with each other</li>
-                      <li>• Works in Slack, no learning curve</li>
-                    </ul>
+                  <div className="space-y-4">
+                    <div className="h-[180px] flex items-center justify-center">
+                      <img
+                        src={correctingImg}
+                        alt="Correct — every correction is permanently remembered"
+                        className="h-full w-auto"
+                      />
+                    </div>
+                    <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
+                      2
+                    </div>
+                    <h3 className="text-lg font-semibold">Correct</h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Your workers do the work. You correct them — in Slack, in
+                      email, in the dashboard. Every correction is permanent. They
+                      never make the same mistake twice.
+                    </p>
                   </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="p-6 border rounded-lg bg-background">
-                    <div className="font-semibold mb-2">❌ Developer Frameworks (Letta, LangChain)</div>
-                    <ul className="space-y-2 text-sm text-muted-foreground">
-                      <li>• Requires coding to set up</li>
-                      <li>• Build everything yourself</li>
-                      <li>• No client management</li>
-                      <li>• You handle training data</li>
-                    </ul>
-                  </div>
-                  <div className="p-6 border-2 border-primary rounded-lg bg-primary/5">
-                    <div className="font-semibold mb-2">✓ Ergoly Platform</div>
-                    <ul className="space-y-2 text-sm">
-                      <li>• Set up in 10 minutes, no code</li>
-                      <li>• Pre-built workers and workflows</li>
-                      <li>• Built-in client management</li>
-                      <li>• Learns from your emoji feedback</li>
-                    </ul>
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="p-6 border rounded-lg bg-background">
-                    <div className="font-semibold mb-2">❌ Traditional CRM/Project Tools</div>
-                    <ul className="space-y-2 text-sm text-muted-foreground">
-                      <li>• Tracks work, doesn't do it</li>
-                      <li>• You write every message</li>
-                      <li>• Manual status updates</li>
-                      <li>• Another tool to check</li>
-                    </ul>
-                  </div>
-                  <div className="p-6 border-2 border-primary rounded-lg bg-primary/5">
-                    <div className="font-semibold mb-2">✓ Ergoly Operating System</div>
-                    <ul className="space-y-2 text-sm">
-                      <li>• Actually does the work</li>
-                      <li>• Workers write client messages</li>
-                      <li>• Automatic coordination & updates</li>
-                      <li>• One platform for everything</li>
-                    </ul>
+                  <div className="space-y-4">
+                    <div className="h-[180px] flex items-center justify-center">
+                      <img
+                        src={scaleImg}
+                        alt="Scale — deploy AI workers across all your channels"
+                        className="h-full w-auto"
+                      />
+                    </div>
+                    <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
+                      3
+                    </div>
+                    <h3 className="text-lg font-semibold">Scale</h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Your AI workers handle client work, use your tools, and
+                      escalate when needed. They show up in Slack, in email,
+                      wherever your clients are. Add more workers as you grow.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -336,36 +338,32 @@ function App() {
           </div>
         </section>
 
-        {/* Use Cases */}
-        <section className="border-t">
-          <div className="container mx-auto px-4 py-20">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
-                Built For Service Businesses Like Yours
-              </h2>
-
-              <div className="grid md:grid-cols-3 gap-6">
-                <div className="p-6 border rounded-lg space-y-3">
-                  <div className="text-4xl">📱</div>
-                  <h3 className="text-lg font-semibold">Marketing Agencies</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Handle client updates, campaign reports, content approvals, and strategy questions without adding headcount.
+        {/* Why Now */}
+        <section className="py-20 md:py-32">
+          <div ref={whyNow.ref} className={whyNow.className}>
+            <div className="container mx-auto px-6">
+              <div className="max-w-3xl mx-auto">
+                <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-10">
+                  Service companies are about to change forever.
+                </h2>
+                <div className="space-y-6 text-muted-foreground text-lg leading-relaxed">
+                  <p>
+                    Margins are shrinking. Clients expect more for less. Hiring is
+                    slow, expensive, and fragile. The math of running a service
+                    company is breaking — unless you change what a team looks
+                    like.
                   </p>
-                </div>
-
-                <div className="p-6 border rounded-lg space-y-3">
-                  <div className="text-4xl">💼</div>
-                  <h3 className="text-lg font-semibold">Consulting Firms</h3>
-                  <p className="text-muted-foreground text-sm">
-                    Manage multiple engagements, coordinate deliverables, and maintain client relationships at scale.
+                  <p>
+                    A new kind of company is forming. One founder. A team of AI
+                    workers trained on their expertise. The output of a 10-person
+                    firm — with the quality of a personal touch.
                   </p>
-                </div>
-
-                <div className="p-6 border rounded-lg space-y-3">
-                  <div className="text-4xl">⚖️</div>
-                  <h3 className="text-lg font-semibold">Professional Services</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Keep clients informed, coordinate between team members, handle routine inquiries 24/7.
+                  <p>
+                    We're building the infrastructure for these companies. Like
+                    Shopify gave anyone a storefront, Ergoly gives any domain
+                    expert an AI workforce. Your workers live here — with
+                    everything they've learned, every tool they use, every
+                    correction that made them sharper.
                   </p>
                 </div>
               </div>
@@ -373,65 +371,76 @@ function App() {
           </div>
         </section>
 
-        {/* Pricing Preview */}
-        <section className="border-t bg-muted/30">
-          <div className="container mx-auto px-4 py-20">
-            <div className="max-w-2xl mx-auto text-center space-y-6">
-              <h2 className="text-3xl md:text-4xl font-bold">
-                Start With 3 Workers, Unlimited Clients
-              </h2>
-              <p className="text-xl text-muted-foreground">
-                For the cost of one part-time assistant, get a full AI team that works 24/7.
-              </p>
-              <div className="pt-6">
-                <div className="text-5xl font-bold mb-2">$499<span className="text-2xl text-muted-foreground">/month</span></div>
-                <div className="text-muted-foreground mb-8">Everything included. No per-message fees.</div>
-                <Button size="lg" className="text-lg px-12">
-                  Start Free 14-Day Trial
-                </Button>
-                <p className="text-sm text-muted-foreground mt-4">
-                  No credit card required. Cancel anytime.
+        {/* Waitlist */}
+        <section id="waitlist" className="py-20 md:py-32">
+          <div ref={waitlist.ref} className={waitlist.className}>
+            <div className="container mx-auto px-6">
+              <div className="max-w-lg mx-auto text-center">
+                <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+                  Get early access.
+                </h2>
+                <p className="text-muted-foreground mb-10">
+                  We're onboarding founders one at a time. Leave your email —
+                  you'll hear from us personally.
                 </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="border-t">
-          <div className="container mx-auto px-4 py-20">
-            <div className="max-w-3xl mx-auto text-center space-y-8">
-              <h2 className="text-4xl md:text-5xl font-bold">
-                Ready to scale your service business?
-              </h2>
-              <p className="text-xl text-muted-foreground">
-                Join service companies who are serving more clients with less stress. Set up your AI team in 10 minutes.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                <Button size="lg" className="text-lg px-12">
-                  Get Started Free
-                </Button>
-                <Button size="lg" variant="outline" className="text-lg px-8">
-                  Schedule Demo
-                </Button>
+                {submitted ? (
+                  <div className="py-8">
+                    <div className="text-2xl mb-2">✓</div>
+                    <p className="text-lg font-medium text-foreground">
+                      You're on the list.
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      We'll reach out personally when it's your turn.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <form onSubmit={handleSubmit} className="flex gap-3">
+                      <input
+                        type="email"
+                        required
+                        value={email}
+                        onChange={(e) => {
+                          setEmail(e.target.value)
+                          if (emailError) setEmailError("")
+                        }}
+                        className={`flex-1 px-4 py-2.5 rounded-lg bg-card border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 ${
+                          emailError
+                            ? "border-red-500 focus:ring-red-500/50"
+                            : "border-border"
+                        }`}
+                        placeholder="you@example.com"
+                      />
+                      <Button
+                        type="submit"
+                        size="lg"
+                        disabled={submitting}
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground text-base px-6"
+                      >
+                        {submitting ? "Joining..." : "Join the Waitlist"}
+                      </Button>
+                    </form>
+                    {emailError && (
+                      <p className="text-sm text-red-400 mt-2 text-left">
+                        {emailError}
+                      </p>
+                    )}
+                    <p className="text-sm text-muted-foreground mt-6">
+                      You'll hear from our founder personally.
+                    </p>
+                  </>
+                )}
               </div>
             </div>
           </div>
         </section>
 
         {/* Footer */}
-        <footer className="border-t bg-muted/30">
-          <div className="container mx-auto px-4 py-12">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <div className="text-2xl font-bold">Ergoly</div>
-              <div className="text-sm text-muted-foreground">
-                The operating system for service businesses
-              </div>
-              <div className="flex gap-6 text-sm">
-                <a href="#" className="hover:text-primary transition-colors">About</a>
-                <a href="#" className="hover:text-primary transition-colors">Pricing</a>
-                <a href="#" className="hover:text-primary transition-colors">Contact</a>
-              </div>
+        <footer className="py-10">
+          <div className="container mx-auto px-6">
+            <div className="text-center text-sm text-muted-foreground flex items-center justify-center gap-2">
+              <img src={logoLight} alt="Ergoly" className="h-5 inline-block" />
+              {" — "}Your expertise, deployed.
             </div>
           </div>
         </footer>
