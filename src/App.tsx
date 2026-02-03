@@ -8,6 +8,7 @@ import controllImg from "@/assets/controll.svg"
 import teachImg from "@/assets/teach.svg"
 import correctingImg from "@/assets/correcting.svg"
 import scaleImg from "@/assets/scale.svg"
+import mascotImg from "@/assets/mascot.png"
 
 function useReveal() {
   const ref = useRef<HTMLDivElement>(null)
@@ -107,19 +108,30 @@ function App() {
         </nav>
 
         {/* Hero */}
-        <section className="pt-48 pb-20 md:pt-64 md:pb-32">
+        <section className="pt-32 pb-20 md:pt-44 md:pb-32">
           <div className="container mx-auto px-6">
-            <div className="max-w-5xl mx-auto text-center space-y-6">
+            <div className="max-w-5xl mx-auto text-center space-y-4">
+              {/* Mascot */}
+              <div
+                className="flex justify-center animate-fade-up"
+                style={{ animationDelay: "0s" }}
+              >
+                <img
+                  src={mascotImg}
+                  alt="Ergoly mascot"
+                  className="h-48 md:h-56 w-auto"
+                />
+              </div>
               <h1
                 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-[1.1] animate-fade-up"
-                style={{ animationDelay: "0.1s" }}
+                style={{ animationDelay: "0.15s" }}
               >
                 Train AI workers on your expertise.{" "}
                 <span className="text-primary">Scale your service company.</span>
               </h1>
               <p
                 className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed animate-fade-up"
-                style={{ animationDelay: "0.3s" }}
+                style={{ animationDelay: "0.35s" }}
               >
                 Ergoly is infrastructure for founders who run service companies
                 with AI workers — trained on their domain expertise, learning
@@ -130,7 +142,7 @@ function App() {
               </p>
               <div
                 className="pt-8 animate-fade-up"
-                style={{ animationDelay: "0.5s" }}
+                style={{ animationDelay: "0.55s" }}
               >
                 <Button
                   size="lg"
