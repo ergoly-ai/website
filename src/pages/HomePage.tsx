@@ -2,6 +2,13 @@ import { useState, useEffect, useRef } from "react"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Button } from "@/components/ui/button"
 import logoLight from "@/assets/logo-light.svg"
+import logoSlack from "@/assets/logos/slack.svg"
+import logoGmail from "@/assets/logos/gmail.svg"
+import logoOutlook from "@/assets/logos/outlook.svg"
+import logoGcal from "@/assets/logos/gcal.svg"
+import logoNotion from "@/assets/logos/notion.svg"
+import logoZoom from "@/assets/logos/zoom.svg"
+import logoAsana from "@/assets/logos/asana.svg"
 import neverForgetImg from "@/assets/never-forget.svg"
 import doesWorkImg from "@/assets/does-work.svg"
 import controllImg from "@/assets/controll.svg"
@@ -90,6 +97,44 @@ export function HomePage() {
   const whyNow = useReveal()
   const waitlist = useReveal()
 
+  const brands = [
+    { name: "Slack", src: logoSlack },
+    { name: "Gmail", src: logoGmail },
+    { name: "Outlook", src: logoOutlook },
+    { name: "Google Calendar", src: logoGcal },
+    { name: "Notion", src: logoNotion },
+    { name: "Zoom", src: logoZoom },
+    { name: "Asana", src: logoAsana },
+  ]
+  const trackRef = useRef<HTMLDivElement>(null)
+  const offsetRef = useRef(0)
+  const rafRef = useRef<number>(0)
+
+  useEffect(() => {
+    const track = trackRef.current
+    if (!track) return
+    const count = brands.length
+
+    const tick = () => {
+      if (track.children.length < count * 2) return
+      const eighth = track.children[count] as HTMLElement
+      const widthOfFirstSet = eighth ? eighth.offsetLeft : track.scrollWidth / 2
+      const speed = 40 / 60
+      offsetRef.current += speed
+      if (offsetRef.current >= widthOfFirstSet) {
+        for (let i = 0; i < count; i++) {
+          const node = track.firstElementChild
+          if (node) track.appendChild(node)
+        }
+        offsetRef.current -= widthOfFirstSet
+      }
+      track.style.transform = `translate3d(-${offsetRef.current}px, 0, 0)`
+      rafRef.current = requestAnimationFrame(tick)
+    }
+    rafRef.current = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(rafRef.current)
+  }, [])
+
   return (
     <ThemeProvider>
       <div className="min-h-screen">
@@ -158,6 +203,23 @@ export function HomePage() {
               </div>
             </div>
           </div>
+        </section>
+
+        {/* Logo carousel */}
+        <section className="py-12 md:py-16 overflow-hidden">
+          <div ref={trackRef} className="flex flex-nowrap w-max gap-16 md:gap-24 items-center will-change-transform">
+            {[...brands, ...brands].map((brand, i) => (
+              <img
+                key={`${brand.name}-${i}`}
+                src={brand.src}
+                alt={brand.name}
+                className="h-8 md:h-10 w-auto object-contain opacity-80 flex-shrink-0"
+              />
+            ))}
+          </div>
+          <p className="text-center text-sm text-muted-foreground mt-6">
+            and thousands more
+          </p>
         </section>
 
         {/* Problem */}
