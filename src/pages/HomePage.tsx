@@ -37,11 +37,12 @@ const useCasesData = [
     name: 'All Businesses',
     headline: 'Your inbox, handled',
     tasks: [
-      'Monitors email, Slack, WhatsApp — all in one place',
-      'Flags what\'s important based on YOUR rules',
-      'If it\'s a task, kicks it off automatically',
-      'You focus on what matters, everything else is sorted'
-    ]
+      'Monitors email, Slack, WhatsApp for you',
+      'Writes drafts, or replies directly when confident',
+      'Writes tasks from communication and executes them',
+      'Learns from your behaviour to improve'
+    ],
+    benefit: 'Build it your way — your inbox becomes a launchpad, not a time sink'
   },
   {
     id: 'tax',
@@ -52,18 +53,20 @@ const useCasesData = [
       'Cross-references against current tax code',
       'Pre-fills forms for your review',
       'Sends deadline reminders so nothing slips'
-    ]
+    ],
+    benefit: 'Build it your way — focus on the details that matter'
   },
   {
     id: 'consulting',
     name: 'Consulting',
-    headline: 'Client-ready in minutes',
+    headline: 'Effortlessly prepared for every call',
     tasks: [
-      'Builds decks from your frameworks overnight',
-      'Researches client industries before meetings',
-      'Sends meeting notes within the hour',
-      'You walk in knowing more than they expect'
-    ]
+      'Keeps track of knowledge you build over time per client',
+      'Gives you summaries before every call',
+      'Creates action lists after calls',
+      'Executes your playbook with clients'
+    ],
+    benefit: 'Walk into every meeting knowing more than they expect'
   },
   {
     id: 'coaching',
@@ -71,10 +74,11 @@ const useCasesData = [
     headline: 'Every session, fully prepped',
     tasks: [
       'Reviews client history before each call',
-      'Sends follow-up resources you discussed',
+      'Applies your frameworks to analyze their state',
       'Handles booking and rescheduling',
-      'Tracks progress between sessions'
-    ]
+      'Sends follow-up resources you discussed'
+    ],
+    benefit: 'Focus on the client while relying on your team of workers'
   },
   {
     id: 'legal',
@@ -85,7 +89,8 @@ const useCasesData = [
       'Tracks filing deadlines, sends reminders',
       'Prepares intake summaries for new clients',
       'Keeps documents organized by matter'
-    ]
+    ],
+    benefit: 'Stay focused on strategy while the details are handled'
   },
   {
     id: 'custom',
@@ -145,7 +150,7 @@ const IndustryCarousel = forwardRef<HTMLDivElement, { className?: string }>(
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-6">
                 What your workers actually do
               </h2>
-              <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
+              <p className="text-muted-foreground text-center mb-16 max-w-2xl mx-auto">
                 You decide what your workers handle. Here's what founders use them for most.
               </p>
 
@@ -154,7 +159,7 @@ const IndustryCarousel = forwardRef<HTMLDivElement, { className?: string }>(
                 {/* Left Arrow */}
                 <button
                   onClick={goPrev}
-                  className="hidden md:flex items-center justify-center w-12 h-12 rounded-full border border-border/50 text-muted-foreground hover:text-primary hover:border-primary transition-colors shrink-0"
+                  className="hidden md:flex items-center justify-center w-12 h-12 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
                   aria-label="Previous"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -211,7 +216,7 @@ const IndustryCarousel = forwardRef<HTMLDivElement, { className?: string }>(
                           key={i}
                           className="flex items-start gap-4 p-4 rounded-xl bg-background/40 border border-border/20"
                         >
-                          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                             <span className="text-primary text-sm font-semibold">{i + 1}</span>
                           </div>
                           <p className="text-foreground/80 text-sm md:text-base leading-relaxed">{task}</p>
@@ -224,7 +229,7 @@ const IndustryCarousel = forwardRef<HTMLDivElement, { className?: string }>(
                 {/* Right Arrow */}
                 <button
                   onClick={goNext}
-                  className="hidden md:flex items-center justify-center w-12 h-12 rounded-full border border-border/50 text-muted-foreground hover:text-primary hover:border-primary transition-colors shrink-0"
+                  className="hidden md:flex items-center justify-center w-12 h-12 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
                   aria-label="Next"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -237,7 +242,7 @@ const IndustryCarousel = forwardRef<HTMLDivElement, { className?: string }>(
               <div className="flex md:hidden justify-center gap-4 mt-6">
                 <button
                   onClick={goPrev}
-                  className="flex items-center justify-center w-10 h-10 rounded-full border border-border/50 text-muted-foreground hover:text-primary hover:border-primary transition-colors"
+                  className="flex items-center justify-center w-10 h-10 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
                   aria-label="Previous"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -246,7 +251,7 @@ const IndustryCarousel = forwardRef<HTMLDivElement, { className?: string }>(
                 </button>
                 <button
                   onClick={goNext}
-                  className="flex items-center justify-center w-10 h-10 rounded-full border border-border/50 text-muted-foreground hover:text-primary hover:border-primary transition-colors"
+                  className="flex items-center justify-center w-10 h-10 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
                   aria-label="Next"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -716,7 +721,7 @@ export function HomePage() {
                             ? "border-red-500 focus:ring-red-500/50"
                             : "border-border"
                         }`}
-                        placeholder="you@example.com"
+                        placeholder="your@email.com"
                       />
                       <Button
                         type="submit"
