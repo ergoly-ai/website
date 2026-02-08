@@ -33,17 +33,17 @@
   --foreground: #ffffff;
   --card: #1F2B3D;
   --card-foreground: #ffffff;
-  --primary: #0A7EA4;
+  --primary: #45B0D2;
   --primary-foreground: #ffffff;
   --secondary: #243044;
   --secondary-foreground: #ffffff;
   --muted: #243044;
-  --muted-foreground: #8899AA;
-  --accent: #0A7EA4;
+  --muted-foreground: #B0BEC5;
+  --accent: #45B0D2;
   --accent-foreground: #ffffff;
   --border: rgba(255, 255, 255, 0.08);
   --input: rgba(255, 255, 255, 0.1);
-  --ring: #0A7EA4;
+  --ring: #45B0D2;
 }
 
 @layer base {

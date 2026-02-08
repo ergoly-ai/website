@@ -71,11 +71,42 @@ export function InvestorPage() {
           </div>
         </section>
 
+        {/* It's Time to Scale */}
+        <section className="py-20 md:py-32">
+          <div className="container mx-auto px-6">
+            <div className="max-w-3xl mx-auto">
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-10">
+                It's time to scale without hiring.
+              </h2>
+              <div className="space-y-6 text-muted-foreground text-lg leading-relaxed">
+                <p>
+                  Your margins are under pressure. Clients want more for less.
+                  Hiring is slow, expensive, and when someone leaves you start
+                  over. The way you've always run your firm doesn't scale — unless
+                  you change what your team looks like.
+                </p>
+                <p>
+                  AI can do real work now. The bottleneck isn't the technology
+                  anymore. It's having workers that learn your standards, use
+                  your tools, and don't cross wires between clients. That's what
+                  we're building.
+                </p>
+                <p>
+                  Ergoly gives you an AI workforce trained on your expertise.
+                  Your workers live here — everything they've learned, every
+                  correction that made them sharper. You get the output of a
+                  bigger firm with the quality of your personal touch.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <footer className="py-10 mt-20 border-t border-border">
           <div className="container mx-auto px-6">
             <div className="text-center text-sm text-muted-foreground flex items-center justify-center gap-2">
               <img src={logoLight} alt="Ergoly" className="h-5 inline-block" />
-              {" — "}Your expertise, deployed.
+              {" — "}Your expertise, scaled.
             </div>
           </div>
         </footer>
